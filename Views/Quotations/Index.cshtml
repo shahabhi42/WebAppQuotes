@@ -1,0 +1,84 @@
+﻿@model IEnumerable<QuotationsApp.Models.Quotation>
+
+@{
+    ViewBag.Title = "Best Quotes";
+}
+
+<style>
+    .webgrid-table {
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        font-size: 1.1em;
+        width: 100%;
+        display: table;
+        border-collapse: collapse;
+        border: solid 1px #624c4c;
+        background-color: white;
+    }
+
+        .webgrid-table td, th {
+            border: 1px solid #000000;
+            padding: 3px 7px 2px;
+        }
+
+    .webgrid-header {
+        background-color: #8b8686;
+        color: #FFFFFF;
+        padding-bottom: 4px;
+        padding-top: 5px;
+        text-align: left;
+    }
+    .webgrid-row-style {
+        padding: 5px 7px 2px;
+    }
+
+    .webgrid-alternating-row {
+        background-color: #8b8686;
+        padding: 5px 7px 2px;
+    }
+</style>
+<br />
+<br />
+
+<div>
+    @Html.ActionLink("Add Quote", "Create", null, new { @class = "btn btn-danger" })
+</div>
+<br />
+@using (Html.BeginForm("Index", "Quotations", FormMethod.Get, Html.TextBox("id")))
+{
+    <form class="form-search" name="id">
+        <label>Unified Search</label>
+        @Html.TextBox("id")
+        <button class="btn btn-danger">Search</button>
+    </form>
+}
+<br />
+
+@{
+    var grid = new WebGrid(Model, canPage: true, rowsPerPage: 10,
+    selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+    grid.Pager(WebGridPagerModes.NextPrevious);}
+
+<div>
+    @grid.GetHtml(
+    tableStyle: "webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    columns: grid.Columns(
+    grid.Column(columnName: "Quote", header: "Quotes", canSort: false),
+    grid.Column(columnName: "Category.Name", header: "Type of Quote"),
+    grid.Column(columnName: "Author", header: "Author"),
+    grid.Column(columnName: "Date", header: "Date Added", format: @<text>@item.Date.ToString("MM/dd/yyyy")</text>),
+
+    grid.Column(
+    format: (item) =>
+    {
+        var links = Html.ActionLink("Edit", "Edit", new { id = item.QuotationID }, new { @class = "btn btn-success btn-xs" }) + " | " +
+                    Html.ActionLink("Details", "Details", new { id = item.QuotationID }, new { @class = "btn btn-info btn-xs" }) + " | " +
+                    Html.ActionLink("Delete", "Delete", new { id = item.QuotationID }, new { @class = "btn btn-danger btn-xs" });
+
+        return Html.Raw(links);
+
+    })
+     ))
+</div>
